@@ -1,0 +1,44 @@
+# AI Code Reviewer Configuration
+# Override any of these in your .env file or CI environment variables
+
+reviewer:
+  model: "gpt-4o"          # OpenAI model to use
+  temperature: 0.2          # Lower = more deterministic reviews
+  max_file_size_kb: 100     # Skip files larger than this
+
+filters:
+  # File extensions to review (empty list = review all)
+  include_extensions:
+    - .py
+    - .js
+    - .ts
+    - .swift
+    - .kt
+    - .java
+    - .go
+
+  # Paths to ignore (glob patterns)
+  exclude_paths:
+    - "tests/*"
+    - "**/__pycache__/**"
+    - "**/node_modules/**"
+    - "**/vendor/**"
+    - "*.min.js"
+
+thresholds:
+  # PR will be marked as failed if score is below this
+  min_score: 60
+  # Block merge if any issue of this severity or above is found
+  block_on_severity: "high"   # critical | high | medium | low
+
+github:
+  # Post review as: COMMENT | REQUEST_CHANGES | APPROVE
+  review_event: "REQUEST_CHANGES"
+  # Add inline comments for specific line issues
+  inline_comments: true
+
+output:
+  # Output directory for local reports
+  report_dir: "./reports"
+  # Formats: markdown | json | both
+  format: "both"
