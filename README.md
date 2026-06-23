@@ -1,34 +1,34 @@
 # 🤖 AI Code Reviewer
 
-> **KR3 — Internal AI Initiative #1**  
-> Automate team workflows: Code Review + Documentation + Test Suggestion  
+> **KR3 — Internal AI Initiative #1**
+> Automate team workflows: Code Review + Documentation + Test Suggestion
 > Status: ✅ Completed | Due: 20/06/2026
 
 ---
 
-## Tổng quan
+## Overview
 
-**AI Code Reviewer** là một công cụ nội bộ sử dụng **GPT-4o** để tự động hóa ba quy trình trong workflow của team:
+**AI Code Reviewer** is an internal tool using **GPT-4o** to automate three team workflows:
 
-| Tính năng | Mô tả |
-|-----------|-------|
-| 🔍 **AI Code Review** | Phân tích code, phát hiện bug, lỗ hổng bảo mật, vấn đề hiệu suất |
-| 📝 **Documentation Generator** | Tự động thêm docstring/comment còn thiếu vào source code |
-| 🧪 **Test Suggestion** | Đề xuất các test case cần viết cho từng function/class |
-| 🔗 **GitHub PR Integration** | Tự động post review comment vào GitHub Pull Request |
-| ⚙️ **GitHub Actions** | Chạy tự động khi có PR mới, không cần thao tác thủ công |
+| Feature | Description |
+|---------|-------------|
+| 🔍 **AI Code Review** | Analyze code to find bugs, security vulnerabilities, and performance issues |
+| 📝 **Documentation Generator** | Automatically add missing docstrings/comments to source code |
+| 🧪 **Test Suggestion** | Recommend test cases to write for each function/class |
+| 🔗 **GitHub PR Integration** | Automatically post review comments to GitHub Pull Requests |
+| ⚙️ **GitHub Actions** | Run automatically on new PRs without manual steps |
 
 ---
 
-## Cấu trúc dự án
+## Project Structure
 
 ```
 ai-code-reviewer/
 ├── main.py                          # CLI entry point
 ├── requirements.txt                 # Python dependencies
-├── .env.example                     # Mẫu cấu hình environment
+├── .env.example                     # Example environment configuration
 ├── config/
-│   └── config.yaml                  # Cấu hình reviewer, filter, threshold
+│   └── config.yaml                  # Reviewer configuration, filters, thresholds
 ├── src/
 │   ├── __init__.py
 │   ├── code_reviewer.py             # Core: AI review logic (GPT-4o)
@@ -39,82 +39,82 @@ ai-code-reviewer/
 │   └── workflows/
 │       └── ai-review.yml            # GitHub Actions workflow
 ├── examples/
-│   └── sample_code.py               # Code mẫu để test
+│   └── sample_code.py               # Sample code for testing
 └── tests/
     └── test_reviewer.py             # Unit tests (mock OpenAI)
 ```
 
 ---
 
-## Yêu cầu hệ thống
+## System Requirements
 
 - Python **3.11+**
-- Tài khoản [OpenAI](https://platform.openai.com/) với API key
-- (Tùy chọn) GitHub Personal Access Token nếu dùng tính năng PR
+- An [OpenAI](https://platform.openai.com/) account with an API key
+- (Optional) GitHub Personal Access Token if you use the PR features
 
 ---
 
-## Cài đặt
+## Installation
 
-### 1. Clone/Copy project
+### 1. Clone / enter the project directory
 
 ```bash
 cd ai-code-reviewer
 ```
 
-### 2. Tạo virtual environment
+### 2. Create a virtual environment
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate       # macOS/Linux
-# hoặc: .venv\Scripts\activate  # Windows
+# or: .venv\Scripts\activate  # Windows
 ```
 
-### 3. Cài dependencies
+### 3. Install dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Cấu hình environment
+### 4. Configure environment
 
 ```bash
 cp .env.example .env
 ```
 
-Mở file `.env` và điền:
+Open `.env` and fill in:
 
 ```env
 OPENAI_API_KEY=sk-...your-openai-key...
-GITHUB_TOKEN=ghp_...your-github-token...   # chỉ cần cho tính năng PR
+GITHUB_TOKEN=ghp_...your-github-token...   # only needed for PR posting
 ```
 
 ---
 
-## Hướng dẫn sử dụng
+## Usage
 
-### Lệnh 1: Review file hoặc thư mục
+### Command 1: Review a file or directory
 
 ```bash
-# Review một file
+# Review a single file
 python main.py review src/my_module.py
 
-# Review toàn bộ thư mục src/
+# Review the entire src/ directory
 python main.py review src/
 
-# Review nhiều file, lưu report ra thư mục tùy chỉnh
+# Review multiple paths and save reports to a custom folder
 python main.py review src/ tests/ --output ./my-reports
 
-# Review và trả về exit code 1 nếu có lỗi nghiêm trọng (dùng trong CI)
+# Return exit code 1 if there are severe issues (useful in CI)
 python main.py review src/ --fail-on-issues
 
-# Chọn format report
-python main.py review src/ --format markdown   # chỉ Markdown
-python main.py review src/ --format json       # chỉ JSON
-python main.py review src/ --format both       # cả hai (mặc định)
+# Choose report format
+python main.py review src/ --format markdown   # markdown only
+python main.py review src/ --format json       # json only
+python main.py review src/ --format both       # both (default)
 ```
 
-**Kết quả mẫu:**
+Sample output:
 
 ```
 ╭─────────────────── Review Result ─────────────────────╮
@@ -125,8 +125,8 @@ python main.py review src/ --format both       # cả hai (mặc định)
 │ Severity │ Category │ Location │ Message                       │
 ├──────────┼──────────┼──────────┼───────────────────────────────┤
 │ 🔴 crit  │ security │ L9       │ SQL injection vulnerability    │
-│ 🟠 high  │ security │ L5-7     │ MD5 is not suitable for pwd   │
-│ 🟡 med   │ style    │ L20      │ Use enumerate instead of len  │
+│ 🟠 high  │ security │ L5-7     │ MD5 is not suitable for pwd    │
+│ 🟡 med   │ style    │ L20      │ Use enumerate instead of len   │
 └──────────┴──────────┴──────────┴───────────────────────────────┘
 
 🧪 Test Suggestions:
@@ -143,109 +143,109 @@ python main.py review src/ --format both       # cả hai (mặc định)
 
 ---
 
-### Lệnh 2: Review GitHub Pull Request
+### Command 2: Review a GitHub Pull Request
 
 ```bash
-# Review PR #42 trong repo myorg/myrepo và post comment
+# Review PR #42 in repo myorg/myrepo and post comments
 python main.py pr --owner myorg --repo myrepo --pr 42
 
-# Review nhưng KHÔNG post comment lên GitHub (chỉ xem local)
+# Review but DO NOT post comments to GitHub (local only)
 python main.py pr --owner myorg --repo myrepo --pr 42 --no-post-comment
 ```
 
-Tool sẽ:
-1. Fetch danh sách file thay đổi trong PR
-2. Gửi từng diff lên GPT-4o để review
-3. Post review comment có bảng issues + suggestions vào PR
+The tool will:
+1. Fetch the list of changed files in the PR
+2. Send each diff to GPT-4o for review
+3. Post a review comment with a table of issues + suggestions to the PR
 
 ---
 
-### Lệnh 3: Tự động generate documentation
+### Command 3: Automatically generate documentation
 
 ```bash
-# Xem kết quả tại terminal (không ghi file)
+# Print results to terminal (do not overwrite files)
 python main.py document src/my_module.py
 
-# Ghi đè file gốc với docstring đã được thêm
+# Overwrite the original file with added docstrings
 python main.py document src/my_module.py --write
 
-# Lưu file đã document vào thư mục khác (không ghi đè gốc)
+# Save documented files to a different folder (do not overwrite originals)
 python main.py document src/ --output-dir ./documented/
 ```
 
 ---
 
-### Demo nhanh với file mẫu
+### Quick demo with the sample file
 
 ```bash
-# Thử review file mẫu có sẵn (có chứa các lỗi cố ý)
+# Try reviewing the provided sample file (contains intentional issues)
 python main.py review examples/sample_code.py
 
-# Thử generate documentation cho file mẫu
+# Try generating documentation for the sample file
 python main.py document examples/sample_code.py
 ```
 
 ---
 
-## Tích hợp GitHub Actions (CI/CD)
+## GitHub Actions Integration (CI/CD)
 
-File `.github/workflows/ai-review.yml` đã được cấu hình sẵn.  
-Mỗi khi có Pull Request mới hoặc cập nhật, workflow sẽ tự động chạy.
+The `.github/workflows/ai-review.yml` workflow is preconfigured.
+It runs automatically whenever a Pull Request is opened or updated.
 
-### Bước setup:
+### Setup steps:
 
-1. Vào **GitHub repo → Settings → Secrets and variables → Actions**
-2. Thêm secret:
-   - `OPENAI_API_KEY` — OpenAI API key của bạn
-   - `GITHUB_TOKEN` — tự động có trong GitHub Actions, không cần thêm
+1. Go to your GitHub repo → Settings → Secrets and variables → Actions
+2. Add the following secret(s):
+   - `OPENAI_API_KEY` — your OpenAI API key
+   - `GITHUB_TOKEN` — automatically available in GitHub Actions, no need to add
 
-3. Push workflow file lên repo:
+3. Push the workflow file to the repo:
    ```bash
    git add .github/workflows/ai-review.yml
    git commit -m "feat: add AI code review workflow"
    git push
    ```
 
-4. Tạo một PR bất kỳ — AI review sẽ tự động xuất hiện! 🎉
+4. Open any PR — the AI review will run automatically! 🎉
 
 ---
 
-## Cấu hình nâng cao
+## Advanced Configuration
 
-Chỉnh sửa `config/config.yaml` để tùy chỉnh:
+Edit `config/config.yaml` to customize behavior:
 
 ```yaml
 reviewer:
-  model: "gpt-4o"          # hoặc "gpt-4-turbo", "gpt-3.5-turbo"
-  max_file_size_kb: 100    # bỏ qua file lớn hơn ngưỡng này
+  model: "gpt-4o"          # or "gpt-4-turbo", "gpt-3.5-turbo"
+  max_file_size_kb: 100     # skip files larger than this threshold
 
 filters:
-  include_extensions:      # chỉ review các loại file này
+  include_extensions:       # only review these file extensions
     - .py
     - .swift
     - .ts
-  exclude_paths:           # bỏ qua các path này
+  exclude_paths:            # skip these paths
     - "tests/*"
     - "**/node_modules/**"
 
 thresholds:
-  min_score: 60            # điểm tối thiểu để pass
-  block_on_severity: "high"  # REQUEST_CHANGES nếu có issue >= mức này
+  min_score: 60             # minimum score to pass
+  block_on_severity: "high"  # REQUEST_CHANGES if any issue >= this severity
 
 github:
-  review_event: "REQUEST_CHANGES"   # hoặc "COMMENT"
+  review_event: "REQUEST_CHANGES"   # or "COMMENT"
   inline_comments: true
 ```
 
 ---
 
-## Chạy Unit Tests
+## Running Unit Tests
 
 ```bash
-# Chạy toàn bộ test suite (không cần OpenAI API key — dùng mock)
+# Run the full test suite (no OpenAI API key required — uses mocks)
 python -m pytest tests/ -v
 
-# Kết quả mong đợi:
+# Expected results:
 # tests/test_reviewer.py::TestDetectLanguage::test_python PASSED
 # tests/test_reviewer.py::TestDetectLanguage::test_typescript PASSED
 # tests/test_reviewer.py::TestAICodeReviewer::test_review_returns_result PASSED
@@ -255,19 +255,19 @@ python -m pytest tests/ -v
 
 ---
 
-## Chi phí ước tính (OpenAI API)
+## Estimated Cost (OpenAI API)
 
-| Kịch bản | Token ước tính | Chi phí (GPT-4o) |
-|----------|----------------|------------------|
-| Review 1 file ~200 dòng | ~2,000 tokens | ~$0.01 |
-| PR với 5 file thay đổi | ~10,000 tokens | ~$0.05 |
-| Review toàn bộ project nhỏ (~20 files) | ~40,000 tokens | ~$0.20 |
+| Scenario | Estimated tokens | Cost (GPT-4o) |
+|---------|------------------:|---------------:|
+| Review 1 file (~200 lines) | ~2,000 tokens | ~$0.01 |
+| PR with 5 changed files     | ~10,000 tokens | ~$0.05 |
+| Review a small project (~20 files) | ~40,000 tokens | ~$0.20 |
 
-> Sử dụng `gpt-3.5-turbo` trong config để giảm chi phí ~10x (ít chính xác hơn).
+> Use `gpt-3.5-turbo` in the config to reduce costs by ~10x (less accurate).
 
 ---
 
-## Kiến trúc hệ thống
+## System Architecture
 
 ```
 Developer opens PR
@@ -291,12 +291,12 @@ main.py pr command
 
 ---
 
-## Tham khảo & Nguồn cảm hứng
+## References & Inspiration
 
-| Tool | Link | Đóng góp |
-|------|------|----------|
-| **Danger** | [github.com/danger/danger](https://github.com/danger/danger) | Ý tưởng automated PR checks |
-| **SwiftLint** | [github.com/realm/SwiftLint](https://github.com/realm/SwiftLint) | Pattern phân tích style/convention |
+| Tool | Link | Contribution |
+|------|------|--------------|
+| **Danger** | [github.com/danger/danger](https://github.com/danger/danger) | Idea for automated PR checks |
+| **SwiftLint** | [github.com/realm/SwiftLint](https://github.com/realm/SwiftLint) | Style/convention analysis patterns |
 | **Sourcegraph Cody** | [github.com/sourcegraph/cody](https://github.com/sourcegraph/cody) | AI-assisted code understanding |
 | **SwiftFormat** | [github.com/nicklockwood/SwiftFormat](https://github.com/nicklockwood/SwiftFormat) | Code formatting automation |
 
@@ -304,5 +304,5 @@ main.py pr command
 
 ## License
 
-MIT — Internal use only.  
+MIT — Internal use only.
 *Developed as part of KR3: Internal AI Initiative #1*
